@@ -1473,8 +1473,8 @@ bool AppInitParameterInteraction()
         boost::split(vstrReplacementModes, strReplacementModeList, boost::is_any_of(","));
         fEnableReplacement = (std::find(vstrReplacementModes.begin(), vstrReplacementModes.end(), "fee") != vstrReplacementModes.end());
     }
+    return true;
 }
-
 static bool LockDataDirectory(bool probeOnly)
 {
 	MilliSleep(1500);
