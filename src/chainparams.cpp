@@ -199,7 +199,6 @@ public:
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         fMiningRequiresPeers = true;
-        fDefaultConsistencyChecks = false;
 
         checkpointData = CCheckpointData {
                 boost::assign::map_list_of

@@ -63,8 +63,6 @@ public:
     const CBlock& GenesisBlock() const { return genesis; }
     /** Make miner wait to have peers to avoid wasting work */
     bool MiningRequiresPeers() const { return fMiningRequiresPeers; }
-    /** Default value for -checkmempool and -checkblockindex argument */
-    bool DefaultConsistencyChecks() const { return fDefaultConsistencyChecks; }
     uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
@@ -91,7 +89,6 @@ protected:
     CBlock genesis;
     std::vector<SeedSpec6> vFixedSeeds;
     bool fMiningRequiresPeers;
-    bool fDefaultConsistencyChecks;
     CCheckpointData checkpointData;
 	
     /** masternode params*/
