@@ -68,10 +68,6 @@ public:
     /** Policy: Filter transactions that do not match well-defined patterns */
     bool RequireStandard() const { return fRequireStandard; }
     uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }
-    /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
-    bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
-    /** Allow nodes with the same address and multiple ports */
-    bool AllowMultiplePorts() const { return fAllowMultiplePorts; }
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
     const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
@@ -80,7 +76,6 @@ public:
     const CCheckpointData& Checkpoints() const { return checkpointData; }
     /** masternode code from Dash*/
     int64_t MaxTipAge() const { return nMaxTipAge; }
-    int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     int FulfilledRequestExpireTime() const { return nFulfilledRequestExpireTime; }
 
     const ChainTxData& TxData() const { return chainTxData; }
@@ -100,13 +95,10 @@ protected:
     bool fMiningRequiresPeers;
     bool fDefaultConsistencyChecks;
     bool fRequireStandard;
-    bool fMineBlocksOnDemand;
-    bool fAllowMultiplePorts;
     CCheckpointData checkpointData;
 	
     /** masternode params*/
     long nMaxTipAge;
-    int nPoolMaxTransactions;
     int nFulfilledRequestExpireTime;
     ChainTxData chainTxData;
 };

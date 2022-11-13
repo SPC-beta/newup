@@ -178,7 +178,6 @@ public:
         consensus.nInstantSendBlockFilteringStartHeight = 1000;
 
         nMaxTipAge = 24 * 60 * 60;
-        nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
         pchMessageStart[0] = { '0' };
         pchMessageStart[1] = { 'b' };
@@ -202,8 +201,6 @@ public:
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
-        fMineBlocksOnDemand = false;
-        fAllowMultiplePorts = false;
 
         checkpointData = CCheckpointData {
                 boost::assign::map_list_of
