@@ -13,7 +13,7 @@ void CNetFulfilledRequestManager::AddFulfilledRequest(const CService& addr, cons
 {
     LOCK(cs_mapFulfilledRequests);
     CService addrSquashed = CService(addr, 0);
-    mapFulfilledRequests[addrSquashed][strRequest] = GetTime() + Params().FulfilledRequestExpireTime();
+    mapFulfilledRequests[addrSquashed][strRequest] = GetTime() + 60*60;
 }
 
 bool CNetFulfilledRequestManager::HasFulfilledRequest(const CService& addr, const std::string& strRequest)

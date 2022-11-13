@@ -70,10 +70,7 @@ public:
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
     const CCheckpointData& Checkpoints() const { return checkpointData; }
-    /** masternode code from Dash*/
     int64_t MaxTipAge() const { return nMaxTipAge; }
-    int FulfilledRequestExpireTime() const { return nFulfilledRequestExpireTime; }
-
     const ChainTxData& TxData() const { return chainTxData; }
 
 protected:
@@ -90,10 +87,7 @@ protected:
     std::vector<SeedSpec6> vFixedSeeds;
     bool fMiningRequiresPeers;
     CCheckpointData checkpointData;
-	
-    /** masternode params*/
     long nMaxTipAge;
-    int nFulfilledRequestExpireTime;
     ChainTxData chainTxData;
 };
 

@@ -178,7 +178,6 @@ public:
         consensus.nInstantSendBlockFilteringStartHeight = 1000;
 
         nMaxTipAge = 24 * 60 * 60;
-        nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
         pchMessageStart[0] = { '0' };
         pchMessageStart[1] = { 'b' };
         pchMessageStart[2] = { 'z' };
