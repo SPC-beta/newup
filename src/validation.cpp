@@ -108,7 +108,6 @@ bool fAddressIndex = false;
 bool fSpentIndex = false;
 bool fTimestampIndex = false;
 bool fIsBareMultisigStd = DEFAULT_PERMIT_BAREMULTISIG;
-bool fRequireStandard = true;
 bool fCheckBlockIndex = false;
 bool fCheckpointsEnabled = DEFAULT_CHECKPOINTS_ENABLED;
 size_t nCoinCacheUsage = 5000 * 300;
@@ -901,7 +900,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
 
     // Rather not work on nonstandard transactions (unless -testnet/-regtest)
     std::string reason;
-    if (fRequireStandard && !IsStandardTx(tx, reason))
+    if (!IsStandardTx(tx, reason))
         return state.DoS(0, false, REJECT_NONSTANDARD, reason);
 
     // Only accept nLockTime-using transactions that can be mined in the next
@@ -1035,7 +1034,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
         {
 
             // Check for non-standard pay-to-script-hash in inputs
-            if (fRequireStandard && !AreInputsStandard(tx, view))
+            if (!AreInputsStandard(tx, view))
                 return state.Invalid(false, REJECT_NONSTANDARD, "bad-txns-nonstandard-inputs");
 
             int64_t nSigOpsCost = GetTransactionSigOpCost(tx, view, STANDARD_SCRIPT_VERIFY_FLAGS);
@@ -1298,11 +1297,6 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
             }
 
             unsigned int scriptVerifyFlags = SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC;
-            /*
-            if (!Params().RequireStandard()) {
-                scriptVerifyFlags = GetArg("-promiscuousmempoolflags", scriptVerifyFlags);
-            }
-            */
 
             // Check against previous transactions
             // This is done last to help prevent CPU exhaustion denial-of-service attacks.

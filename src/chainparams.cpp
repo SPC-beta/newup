@@ -200,7 +200,6 @@ public:
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
-        fRequireStandard = true;
 
         checkpointData = CCheckpointData {
                 boost::assign::map_list_of
