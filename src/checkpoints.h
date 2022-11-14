@@ -10,8 +10,7 @@
 #include <map>
 
 class CBlockIndex;
-struct CheckTxData;
-struct CCheckpointData;
+struct CheckpointData;
 
 /**
  * Block-chain checkpoints are compiled-in sanity checks.
@@ -19,14 +18,10 @@ struct CCheckpointData;
  */
 namespace Checkpoints
 {
-
-//! Returns last CBlockIndex* in mapBlockIndex that is a checkpoint
-CBlockIndex* GetLastCheckpoint(const CCheckpointData& data);
-
-//! Return conservative estimate of total number of blocks, 0 if unknown
-int GetTotalBlocksEstimate(const CheckTxData& data);
-
-double GuessVerificationProgress(const CheckTxData& data, CBlockIndex* pindex, bool fSigchecks = true);
+double GuessVerificationProgress(const CBlockIndex* pindex);
+CBlockIndex* GetLastCheckpoint(const CheckpointData& data);
+bool CheckBlock(const CheckpointData& data, int nHeight, const uint256& hash, bool fMatchesCheckpoint = false);
+extern bool fEnabled;
 
 } //namespace Checkpoints
 
