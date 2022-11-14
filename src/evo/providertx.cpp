@@ -94,12 +94,21 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
 
     if (pindexPrev->nHeight < Params().GetConsensus().new_version2)  //xxxx
     {
+        if (payoutDest == CTxDestination(ptx.keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting))
+        {
+            return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
+        }
+
         // It's allowed to set addr to 0, which will put the MN into PoSe-banned state and require a ProUpServTx to be issues later
         // If any of both is set, it must be valid however
         if (ptx.addr != CService())
         {
             return false;
         }
+    }
+
+    if (ptx.nOperatorReward > 0) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-protx-operator-reward");
     }
 
     CTxDestination collateralTxDest;
@@ -137,6 +146,14 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
 
         collateralOutpoint = COutPoint(tx.GetHash(), ptx.collateralOutpoint.n);
     }
+
+        if (pindexPrev->nHeight < Params().GetConsensus().new_version2) //xxxx
+        {
+            if (collateralTxDest == CTxDestination(ptx.keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting))
+            {
+                return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
+            }
+        }
 
     if (pindexPrev) {
         auto mnList = deterministicMNManager->GetListForBlock(pindexPrev);
@@ -264,6 +281,14 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
         }
 
+        if (pindexPrev->nHeight < Params().GetConsensus().new_version2)  //xxxx
+        {
+            if (payoutDest == CTxDestination(dmn->pdmnState->keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting))
+            {
+                return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
+            }
+        }
+
         Coin coin;
         if (!GetUTXOCoin(dmn->collateralOutpoint, coin)) {
             // this should never happen (there would be no dmn otherwise)
@@ -274,6 +299,14 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
         CTxDestination collateralTxDest;
         if (!ExtractDestination(coin.out.scriptPubKey, collateralTxDest)) {
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-collateral-dest");
+        }
+
+        if (pindexPrev->nHeight < Params().GetConsensus().new_version2) //xxxx
+        {
+            if (collateralTxDest == CTxDestination(dmn->pdmnState->keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting))
+            {
+                return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
+            }
         }
 
         if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
