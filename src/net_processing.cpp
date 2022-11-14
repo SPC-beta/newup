@@ -1260,12 +1260,6 @@ inline void static SendBlockTransactions(const CBlock& block, const BlockTransac
 bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman& connman, const std::atomic<bool>& interruptMsgProc)
 {
     LogPrint("net", "received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->id);
-    if (IsArgSet("-dropmessagestest") && GetRand(GetArg("-dropmessagestest", 0)) == 0)
-    {
-        LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
-        return true;
-    }
-
     {
         LOCK(cs_main);
         CNode::CheckDandelionEmbargoes();
@@ -1335,7 +1329,17 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             return false;
         }
 
-        if (nVersion < MIN_PEER_PROTO_VERSION)
+        /*const CBlockIndex *pindexPrev;
+        if (nVersion < MIN_PEER_PROTO_VERSION_NEW && pindexPrev->nHeight >= NEW_VERSION) //xxxx
+        {
+            // disconnect from peers older than this proto version
+            LogPrintf("peer=%d using obsolete version(new)) %i; disconnecting\n", pfrom->id, nVersion);
+            connman.PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
+                               strprintf("Version must be %d or greater", MIN_PEER_PROTO_VERSION_NEW)));
+            pfrom->fDisconnect = true;
+            return false;
+        }
+        else*/ if (nVersion < MIN_PEER_PROTO_VERSION)
         {
             // disconnect from peers older than this proto version
             LogPrintf("peer=%d using obsolete version %i; disconnecting\n", pfrom->id, nVersion);
