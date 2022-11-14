@@ -9,7 +9,6 @@
 #include "base58.h"
 #include "chainparams.h"
 #include "clientversion.h"
-#include "consensus/consensus.h"
 #include "core_io.h"
 #include "hash.h"
 #include "messagesigner.h"
@@ -17,6 +16,32 @@
 #include "streams.h"
 #include "univalue.h"
 #include "validation.h"
+
+template <typename ProTx>
+static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidationState& state)
+{
+    if (!proTx.addr.IsValid()) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
+    }
+    if (Params().NetworkIDString() != CBaseChainParams::REGTEST && !proTx.addr.IsRoutable()) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
+    }
+
+    int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
+        if (proTx.addr.GetPort() != mainnetDefaultPort) {
+            //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
+        }
+    } else if (proTx.addr.GetPort() == mainnetDefaultPort) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
+    }
+
+    if (!proTx.addr.IsIPv4()) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
+    }
+
+    return true;
+}
 
 template <typename ProTx>
 static bool CheckHashSig(const ProTx& proTx, const CKeyID& keyID, CValidationState& state)
@@ -91,23 +116,18 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         // should not happen as we checked script types before
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-dest");
     }
-
-    if (pindexPrev->nHeight < Params().GetConsensus().new_version)  //xxxx
-    {
-        if (payoutDest == CTxDestination(ptx.keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting))
-        {
-            return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
-        }
-
-        // It's allowed to set addr to 0, which will put the MN into PoSe-banned state and require a ProUpServTx to be issues later
-        // If any of both is set, it must be valid however
-        if (ptx.addr != CService())
-        {
-            return false;
-        }
+    // don't allow reuse of payout key for other keys (don't allow people to put the payee key onto an online server)
+    if (payoutDest == CTxDestination(ptx.keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting)) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
     }
 
-    if (ptx.nOperatorReward > 0) {
+    // It's allowed to set addr to 0, which will put the MN into PoSe-banned state and require a ProUpServTx to be issues later
+    // If any of both is set, it must be valid however
+    if (ptx.addr != CService() && !CheckService(tx.GetHash(), ptx, state)) {
+        return false;
+    }
+
+    if (ptx.nOperatorReward > 10000) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-operator-reward");
     }
 
@@ -147,13 +167,11 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         collateralOutpoint = COutPoint(tx.GetHash(), ptx.collateralOutpoint.n);
     }
 
-        if (pindexPrev->nHeight < Params().GetConsensus().new_version) //xxxx
-        {
-            if (collateralTxDest == CTxDestination(ptx.keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting))
-            {
-                return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
-            }
-        }
+    // don't allow reuse of collateral key for other keys (don't allow people to put the collateral key onto an online server)
+    // this check applies to internal and external collateral, but internal collaterals are not necessarely a P2PKH
+    if (collateralTxDest == CTxDestination(ptx.keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting)) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
+    }
 
     if (pindexPrev) {
         auto mnList = deterministicMNManager->GetListForBlock(pindexPrev);
@@ -207,6 +225,10 @@ bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVa
 
     if (ptx.nVersion == 0 || ptx.nVersion > CProRegTx::CURRENT_VERSION) {
         return state.DoS(100, false, REJECT_INVALID, "bad-protx-version");
+    }
+
+    if (!CheckService(ptx.proTxHash, ptx, state)) {
+        return false;
     }
 
     if (pindexPrev) {
@@ -281,12 +303,9 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
         }
 
-        if (pindexPrev->nHeight < Params().GetConsensus().new_version)  //xxxx
-        {
-            if (payoutDest == CTxDestination(dmn->pdmnState->keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting))
-            {
-                return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
-            }
+        // don't allow reuse of payee key for other keys (don't allow people to put the payee key onto an online server)
+        if (payoutDest == CTxDestination(dmn->pdmnState->keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting)) {
+            return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
         }
 
         Coin coin;
@@ -300,13 +319,8 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
         if (!ExtractDestination(coin.out.scriptPubKey, collateralTxDest)) {
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-collateral-dest");
         }
-
-        if (pindexPrev->nHeight < Params().GetConsensus().new_version) //xxxx
-        {
-            if (collateralTxDest == CTxDestination(dmn->pdmnState->keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting))
-            {
-                return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
-            }
+        if (collateralTxDest == CTxDestination(dmn->pdmnState->keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting)) {
+            return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
         }
 
         if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {

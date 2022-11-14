@@ -618,5 +618,5 @@ void DumpMempool();
 
 /** Load the mempool from disk. */
 bool LoadMempool();
-
+extern int GetNHeight(const CBlockHeader &block); //xxxx
 #endif // BITCOIN_VALIDATION_H
