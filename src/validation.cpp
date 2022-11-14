@@ -126,7 +126,7 @@ CTxPoolAggregate txpools(::minRelayTxFee);
 // BZX masternode
 std::map <uint256, int64_t> mapRejectedBlocks GUARDED_BY(cs_main);
 
-static void CheckBlockIndex();
+static void CheckBlockIndex(const Consensus::Params& consensusParams);
 
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
@@ -3782,7 +3782,7 @@ bool ActivateBestChain(CValidationState &state, const CChainParams& chainparams,
             uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
         }
     } while (pindexNewTip != pindexMostWork);
-    CheckBlockIndex();
+    CheckBlockIndex(chainparams.GetConsensus());
 
     // Write changes periodically to disk, after relay.
     if (!FlushStateToDisk(state, FLUSH_STATE_PERIODIC)) {
@@ -4348,7 +4348,7 @@ static bool AcceptBlockHeader(const CBlockHeader& block, CValidationState& state
     if (ppindex)
         *ppindex = pindex;
 
-    CheckBlockIndex();
+    CheckBlockIndex(chainparams.GetConsensus());
 
     // Notify external listeners about accepted block header
     GetMainSignals().AcceptedBlockHeader(pindex);
@@ -4474,7 +4474,7 @@ bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<cons
             // Store to disk
             ret = AcceptBlock(pblock, state, chainparams, &pindex, fForceProcessing, NULL, fNewBlock);
         }
-        CheckBlockIndex();
+        CheckBlockIndex(chainparams.GetConsensus());
         if (!ret) {
             GetMainSignals().BlockChecked(*pblock, state);
             return error("%s: AcceptBlock FAILED", __func__);
@@ -5000,7 +5000,7 @@ bool RewindBlockIndex(const CChainParams& params)
 
     PruneBlockIndexCandidates();
 
-    CheckBlockIndex();
+    CheckBlockIndex(params.GetConsensus());
 
     if (!FlushStateToDisk(state, FLUSH_STATE_ALWAYS)) {
         return false;
@@ -5213,7 +5213,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
     return nLoaded > 0;
 }
 
-void static CheckBlockIndex()
+void static CheckBlockIndex(const Consensus::Params& consensusParams)
 {
     LOCK(cs_main);
 
