@@ -2174,18 +2174,18 @@ CBlockIndex* CWallet::ScanForWalletTransactions(CBlockIndex *pindexStart, bool f
                 pindex = chainActive.Next(pindex);
 
         ShowProgress(_("Rescanning..."), 0); // show rescan progress in GUI as dialog or on splashscreen, if -rescan on startup
-        double dProgressStart = GuessVerificationProgress(chainParams.TxData(), pindex);
-        double dProgressTip = GuessVerificationProgress(chainParams.TxData(), chainActive.Tip());
+        double dProgressStart = Checkpoints::GuessVerificationProgress(pindex);
+        double dProgressTip = Checkpoints::GuessVerificationProgress(chainActive.Tip());
         while (pindex)
         {
             // A temporary fix for inability to Ctrl-C rescan when restoring a wallet (will be fixed in 0.15.)
             if (ShutdownRequested())
                 return nullptr;
             if (pindex->nHeight % 100 == 0 && dProgressTip - dProgressStart > 0.0)
-                ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((GuessVerificationProgress(chainParams.TxData(), pindex) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
+                ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(pindex) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
             if (GetTime() >= nNow + 60) {
                 nNow = GetTime();
-                LogPrintf("Still rescanning. At block %d. Progress=%f\n", pindex->nHeight, GuessVerificationProgress(chainParams.TxData(), pindex));
+                LogPrintf("Still rescanning. At block %d. Progress=%f\n", pindex->nHeight, Checkpoints::GuessVerificationProgress(pindex));
             }
 
             CBlock block;
@@ -4259,7 +4259,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 
                 if (nBytes > MAX_STANDARD_TX_SIZE) {
                     // Do not create oversized transactions (bad-txns-oversize).
-                    strFailReason = _("Transaction too large-2");
+                    strFailReason = _("Transaction too large");
                     return false;
                 }
 
@@ -4297,7 +4297,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // because we must be at the maximum allowed fee.
                 if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes))
                 {
-                    strFailReason = _("Transaction too large for fee policy-2");
+                    strFailReason = _("Transaction too large for fee policy");
                     return false;
                 }
 
@@ -4683,7 +4683,7 @@ bool CWallet::CreateMintTransaction(const std::vector <CRecipient> &vecSend, CWa
 
                 // Limit size
                 if (GetTransactionWeight(*wtxNew.tx) >= MAX_STANDARD_TX_SIZE) {
-                    strFailReason = _("Transaction too large-3");
+                    strFailReason = _("Transaction too large");
                     return false;
                 }
                 dPriority = wtxNew.tx->ComputePriority(dPriority, nBytes);
@@ -4963,7 +4963,7 @@ bool CWallet::CreateLelantusMintTransactions(
                     // Limit size
                     CTransaction txConst(tx);
                     if (GetTransactionWeight(txConst) >= MAX_STANDARD_TX_SIZE) {
-                        strFailReason = _("Transaction too large-4");
+                        strFailReason = _("Transaction too large");
                         return false;
                     }
                     dPriority = txConst.ComputePriority(dPriority, nBytes);
@@ -4993,7 +4993,7 @@ bool CWallet::CreateLelantusMintTransactions(
                     // If we made it here and we aren't even able to meet the relay fee on the next pass, give up
                     // because we must be at the maximum allowed fee.
                     if (nFeeNeeded < ::minRelayTxFee.GetFee(nBytes)) {
-                        strFailReason = _("Transaction too large for fee policy-3");
+                        strFailReason = _("Transaction too large for fee policy");
                         return false;
                     }
 
