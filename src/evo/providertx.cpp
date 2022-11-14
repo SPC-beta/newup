@@ -92,7 +92,7 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-dest");
     }
 
-    if (pindexPrev->nHeight < Params().GetConsensus().new_version2)  //xxxx
+    if (pindexPrev->nHeight < Params().GetConsensus().new_version)  //xxxx
     {
         if (payoutDest == CTxDestination(ptx.keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting))
         {
@@ -147,7 +147,7 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         collateralOutpoint = COutPoint(tx.GetHash(), ptx.collateralOutpoint.n);
     }
 
-        if (pindexPrev->nHeight < Params().GetConsensus().new_version2) //xxxx
+        if (pindexPrev->nHeight < Params().GetConsensus().new_version) //xxxx
         {
             if (collateralTxDest == CTxDestination(ptx.keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting))
             {
@@ -281,7 +281,7 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
         }
 
-        if (pindexPrev->nHeight < Params().GetConsensus().new_version2)  //xxxx
+        if (pindexPrev->nHeight < Params().GetConsensus().new_version)  //xxxx
         {
             if (payoutDest == CTxDestination(dmn->pdmnState->keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting))
             {
@@ -301,7 +301,7 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-collateral-dest");
         }
 
-        if (pindexPrev->nHeight < Params().GetConsensus().new_version2) //xxxx
+        if (pindexPrev->nHeight < Params().GetConsensus().new_version) //xxxx
         {
             if (collateralTxDest == CTxDestination(dmn->pdmnState->keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting))
             {
