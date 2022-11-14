@@ -26,14 +26,14 @@ struct SeedSpec6 {
 
 typedef std::map<int, uint256> MapCheckpoints;
 
-struct CCheckpointData {
+struct CheckpointData {
     MapCheckpoints mapCheckpoints;
 };
 
 struct ChainTxData {
-    int64_t nTime;
-    int64_t nTxCount;
-    double dTxRate;
+    int64_t nTimeLastCheckpoint;
+    int64_t nTransactionsLastCheckpoint;
+    double fTransactionsPerDay;
 };
 
 /**
@@ -69,7 +69,7 @@ public:
     const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
-    const CCheckpointData& Checkpoints() const { return checkpointData; }
+    const CheckpointData& Checkpoints() const { return checkpointData; }
     int64_t MaxTipAge() const { return nMaxTipAge; }
     const ChainTxData& TxData() const { return chainTxData; }
 
@@ -86,7 +86,7 @@ protected:
     CBlock genesis;
     std::vector<SeedSpec6> vFixedSeeds;
     bool fMiningRequiresPeers;
-    CCheckpointData checkpointData;
+    CheckpointData checkpointData;
     long nMaxTipAge;
     ChainTxData chainTxData;
 };
