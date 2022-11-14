@@ -190,6 +190,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xfede7817612c884cc527b1598013f6ef1feceea08bb80e1ffb0765dd74ba6a53"));
         vSeeds.push_back(CDNSSeedData("51.91.156.251", "51.91.156.251", false));
         vSeeds.push_back(CDNSSeedData("51.91.156.249", "51.91.156.249", false));
+        vSeeds.push_back(CDNSSeedData("bzx.pool4u.net:29149","bzx.pool4u.net:29149", false));
         base58Prefixes[PUBKEY_ADDRESS] = std::vector < unsigned char > (1, 75);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector < unsigned char > (1, 34);
         base58Prefixes[SECRET_KEY] = std::vector < unsigned char > (1, 210);
@@ -199,16 +200,17 @@ public:
 
         fMiningRequiresPeers = true;
 
-        checkpointData = CCheckpointData {
-                boost::assign::map_list_of
-                (      0, uint256S("0x000004d916d2e66f820fc0ba0b2554b6491a9c5bfc026ea515df5df2ceafcd53"))
-                (     82, uint256S("0x00000811f8cba96565559992346f0074a112cf96de4d17a75e29433e1ed29994"))
-                (  11897, uint256S("0xa80d7942d6bc33d66bf971c7169f6900a91b597a6a703b024be0c1e845a580e7"))
-                (  38459, uint256S("0x22cc62237d33d6f256a864175a8c90aad2dd4afc60321f275948c7cd1a462688"))
-                (  43210, uint256S("0x9b38423aaf26105cdad3a7774d3efea72a0252a587de4d7f0cf43fbcb647575c"))
-                (  43246, uint256S("0xca636fc02cb308c979086170a03630f6c8c160af17e23aa3e69a618a509ac22b"))
-                (  44006, uint256S("0x9618f55a0921634e89f98200af23bc988ed9d323cb5a21f294f568719ad77cfe"))
-                (  44297, uint256S("0x4cade50721b2c6a20ac60d61dc88aeef8e1a3d73f43a01b9325f9c65427b8e05"))
+        checkpointData = {
+            {
+                {     0, uint256S("0x000004d916d2e66f820fc0ba0b2554b6491a9c5bfc026ea515df5df2ceafcd53")},
+                {    82, uint256S("0x00000811f8cba96565559992346f0074a112cf96de4d17a75e29433e1ed29994")},
+                { 11897, uint256S("0xa80d7942d6bc33d66bf971c7169f6900a91b597a6a703b024be0c1e845a580e7")},
+                { 38459, uint256S("0x22cc62237d33d6f256a864175a8c90aad2dd4afc60321f275948c7cd1a462688")},
+                { 43210, uint256S("0x9b38423aaf26105cdad3a7774d3efea72a0252a587de4d7f0cf43fbcb647575c")},
+                { 43246, uint256S("0xca636fc02cb308c979086170a03630f6c8c160af17e23aa3e69a618a509ac22b")},
+                { 44006, uint256S("0x9618f55a0921634e89f98200af23bc988ed9d323cb5a21f294f568719ad77cfe")},
+                { 44297, uint256S("0x4cade50721b2c6a20ac60d61dc88aeef8e1a3d73f43a01b9325f9c65427b8e05")},
+            }
         };
 
         chainTxData = ChainTxData{
