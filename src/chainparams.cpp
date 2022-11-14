@@ -149,6 +149,7 @@ public:
         consensus.nEvoSporkStopBlock = INT_MAX;
         consensus.nEvoMasternodeMinimumConfirmations = 35;
         consensus.evoSporkKeyID = "XFWzf2xwwARUY3fLhY83P4TDh2pSybUQ8y";
+        consensus.new_version = 22222;
 
         // reorg
         consensus.nMaxReorgDepth = 5;

@@ -1329,25 +1329,12 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             return false;
         }
 
-        /*const CBlockIndex *pindexPrev;
-        if (nVersion < MIN_PEER_PROTO_VERSION_NEW && pindexPrev->nHeight >= NEW_VERSION) //xxxx
+        int nHeight;
         {
-            // disconnect from peers older than this proto version
-            LogPrintf("peer=%d using obsolete version(new)) %i; disconnecting\n", pfrom->id, nVersion);
-            connman.PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                               strprintf("Version must be %d or greater", MIN_PEER_PROTO_VERSION_NEW)));
-            pfrom->fDisconnect = true;
-            return false;
+            LOCK(cs_main);
+            nHeight = chainActive.Height();
         }
-        else*/ if (nVersion < MIN_PEER_PROTO_VERSION)
-        {
-            // disconnect from peers older than this proto version
-            LogPrintf("peer=%d using obsolete version %i; disconnecting\n", pfrom->id, nVersion);
-            connman.PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                               strprintf("Version must be %d or greater", MIN_PEER_PROTO_VERSION)));
-            pfrom->fDisconnect = true;
-            return false;
-        }
+        int minPeerVersion = (nHeight + 1 < Params().GetConsensus().new_version) ? MIN_PEER_PROTO_VERSION : MIN_PEER_PROTO_VERSION2;
 
         if (nVersion == 10300)
             nVersion = 300;
@@ -1360,7 +1347,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             if (sscanf(cleanSubVer.c_str(), "/Satoshi:%2d.%2d.%2d.%2d/",
                     &parsedVersion[0], &parsedVersion[1], &parsedVersion[2], &parsedVersion[3]) >= 2) {
                 int peerClientVersion = parsedVersion[0]*1000000 + parsedVersion[1]*10000 + parsedVersion[2]*100 + parsedVersion[3];
-                if (peerClientVersion < MIN_PEER_PROTO_VERSION) {
+                if (peerClientVersion < minPeerVersion) {
                     connman.PushMessage(pfrom, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, strCommand, REJECT_OBSOLETE, "This version is banned from the network"));
                     pfrom->fDisconnect = 1;
                     LOCK(cs_main);

@@ -227,6 +227,7 @@ struct Params {
     int no_zero_payee;
     int utxo;
     int nxt;
+    int new_version;
 
     std::map<LLMQType, LLMQParams> llmqs;
     LLMQType llmqChainLocks;
