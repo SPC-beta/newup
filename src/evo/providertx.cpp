@@ -20,26 +20,6 @@
 template <typename ProTx>
 static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidationState& state)
 {
-    if (!proTx.addr.IsValid()) {
-        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
-    }
-    if (Params().NetworkIDString() != CBaseChainParams::REGTEST && !proTx.addr.IsRoutable()) {
-        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
-    }
-
-    int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
-    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        if (proTx.addr.GetPort() != mainnetDefaultPort) {
-            //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
-        }
-    } else if (proTx.addr.GetPort() == mainnetDefaultPort) {
-        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
-    }
-
-    if (!proTx.addr.IsIPv4()) {
-        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
-    }
-
     return true;
 }
 
