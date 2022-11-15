@@ -18,6 +18,32 @@
 #include "validation.h"
 
 template <typename ProTx>
+static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidationState& state)
+{
+    if (!proTx.addr.IsValid()) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
+    }
+    if (Params().NetworkIDString() != CBaseChainParams::REGTEST && !proTx.addr.IsRoutable()) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
+    }
+
+    int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
+        if (proTx.addr.GetPort() != mainnetDefaultPort) {
+            //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
+        }
+    } else if (proTx.addr.GetPort() == mainnetDefaultPort) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
+    }
+
+    if (!proTx.addr.IsIPv4()) {
+        //return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
+    }
+
+    return true;
+}
+
+template <typename ProTx>
 static bool CheckHashSig(const ProTx& proTx, const CKeyID& keyID, CValidationState& state)
 {
     std::string strError;
@@ -97,7 +123,7 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
 
     // It's allowed to set addr to 0, which will put the MN into PoSe-banned state and require a ProUpServTx to be issues later
     // If any of both is set, it must be valid however
-    if (ptx.addr != CService()) {
+    if (ptx.addr != CService() && !CheckService(tx.GetHash(), ptx, state)) {
         return false;
     }
 
@@ -199,6 +225,10 @@ bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVa
 
     if (ptx.nVersion == 0 || ptx.nVersion > CProRegTx::CURRENT_VERSION) {
         return state.DoS(100, false, REJECT_INVALID, "bad-protx-version");
+    }
+
+    if (!CheckService(ptx.proTxHash, ptx, state)) {
+        return false;
     }
 
     if (pindexPrev) {
