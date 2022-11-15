@@ -101,7 +101,7 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         return false;
     }
 
-    if (ptx.nOperatorReward > 10000) {
+    if (ptx.nOperatorReward > 0) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-operator-reward");
     }
 
