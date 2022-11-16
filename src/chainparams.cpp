@@ -131,10 +131,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000136f0c609d026");
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000000043d640ee04132");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0xca636fc02cb308c979086170a03630f6c8c160af17e23aa3e69a618a509ac22b");
+        consensus.defaultAssumeValid = uint256S("0xd1e22bc4bdc42e4d9208cd8839725cee736f2bf75cfbe1839bbe6eb01aa2b659");
         consensus.utxo = 83;
         consensus.BIP65Height = 84;
         consensus.BIP66Height = 85;
@@ -206,17 +206,15 @@ public:
                 {     0, uint256S("0x000004d916d2e66f820fc0ba0b2554b6491a9c5bfc026ea515df5df2ceafcd53")},
                 {    82, uint256S("0x00000811f8cba96565559992346f0074a112cf96de4d17a75e29433e1ed29994")},
                 { 11897, uint256S("0xa80d7942d6bc33d66bf971c7169f6900a91b597a6a703b024be0c1e845a580e7")},
-                { 38459, uint256S("0x22cc62237d33d6f256a864175a8c90aad2dd4afc60321f275948c7cd1a462688")},
-                { 43210, uint256S("0x9b38423aaf26105cdad3a7774d3efea72a0252a587de4d7f0cf43fbcb647575c")},
-                { 43246, uint256S("0xca636fc02cb308c979086170a03630f6c8c160af17e23aa3e69a618a509ac22b")},
-                { 44006, uint256S("0x9618f55a0921634e89f98200af23bc988ed9d323cb5a21f294f568719ad77cfe")},
                 { 44297, uint256S("0x4cade50721b2c6a20ac60d61dc88aeef8e1a3d73f43a01b9325f9c65427b8e05")},
+                {125169, uint256S("0xd1e22bc4bdc42e4d9208cd8839725cee736f2bf75cfbe1839bbe6eb01aa2b659")},
+
             }
         };
 
         chainTxData = ChainTxData{
-                1655978812, // * UNIX timestamp of last checkpoint block
-                82000,     // * total number of transactions between genesis and last checkpoint
+                1668588535, // * UNIX timestamp of last checkpoint block
+                250000,     // * total number of transactions between genesis and last checkpoint
                             //   (the tx=... number in the SetBestChain debug.log lines)
                 1       // * estimated number of transactions per second after checkpoint
         };
