@@ -4202,9 +4202,9 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         return state.DoS(1, error("%s: forked chain older than max reorganization depth (height %d)", __func__, chainHeight - nHeight));
 
     // Check that the block chain matches the known block chain up to a checkpoint
-    /*if (!Checkpoints::CheckBlock(Params().Checkpoints(), nHeight, hash))
+    if (!Checkpoints::CheckBlock(Params().Checkpoints(), nHeight, hash))
         return state.DoS(100, error("%s : rejected by checkpoint lock-in at %d", __func__, nHeight),
-            REJECT_CHECKPOINT, "checkpoint mismatch");*/ //xxxx
+            REJECT_CHECKPOINT, "checkpoint mismatch");
 
     // Check against checkpoints
     CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(Params().Checkpoints());
