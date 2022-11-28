@@ -4195,7 +4195,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     if (hash == consensus.hashGenesisBlock)
         return true;
-
+/*
     //If this is a reorg, check that it is not too deep
     int nMaxReorgDepth = consensus.nMaxReorgDepth;
     if (chainHeight - nHeight >= nMaxReorgDepth)
@@ -4210,7 +4210,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(Params().Checkpoints());
     if (pcheckpoint && nHeight < pcheckpoint->nHeight)
         return state.DoS(100, error("%s: forked chain older than last checkpoint (height %d)", __func__, nHeight), REJECT_CHECKPOINT, "bad-fork-prior-to-checkpoint");
-
+*/
 	// Check proof of work
     if (block.nBits != GetNextWorkRequired(pindexPrev, &block))
         return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
