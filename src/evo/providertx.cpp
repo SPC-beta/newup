@@ -218,11 +218,6 @@ bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVa
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
         }
 
-        // don't allow updating to addresses already used by other MNs
-        if (mnList.HasUniqueProperty(ptx.addr) && mnList.GetUniquePropertyMN(ptx.addr)->proTxHash != ptx.proTxHash) {
-            //return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-addr");
-        }
-
         if (ptx.scriptOperatorPayout != CScript()) {
             if (mn->nOperatorReward == 0) {
                 // don't allow to set operator reward payee in case no operatorReward was set
