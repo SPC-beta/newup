@@ -18,12 +18,6 @@
 #include "validation.h"
 
 template <typename ProTx>
-static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidationState& state)
-{
-    return true;
-}
-
-template <typename ProTx>
 static bool CheckHashSig(const ProTx& proTx, const CKeyID& keyID, CValidationState& state)
 {
     std::string strError;
@@ -99,16 +93,6 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
     // don't allow reuse of payout key for other keys (don't allow people to put the payee key onto an online server)
     if (payoutDest == CTxDestination(ptx.keyIDOwner) || payoutDest == CTxDestination(ptx.keyIDVoting)) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee-reuse");
-    }
-
-    // It's allowed to set addr to 0, which will put the MN into PoSe-banned state and require a ProUpServTx to be issues later
-    // If any of both is set, it must be valid however
-    if (ptx.addr != CService() && !CheckService(tx.GetHash(), ptx, state)) {
-        return false;
-    }
-
-    if (ptx.nOperatorReward > 0) {
-        return state.DoS(10, false, REJECT_INVALID, "bad-protx-operator-reward");
     }
 
     CTxDestination collateralTxDest;
@@ -207,25 +191,11 @@ bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVa
         return state.DoS(100, false, REJECT_INVALID, "bad-protx-version");
     }
 
-    if (!CheckService(ptx.proTxHash, ptx, state)) {
-        return false;
-    }
-
     if (pindexPrev) {
         auto mnList = deterministicMNManager->GetListForBlock(pindexPrev);
         auto mn = mnList.GetMN(ptx.proTxHash);
         if (!mn) {
             return state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
-        }
-
-        if (ptx.scriptOperatorPayout != CScript()) {
-            if (mn->nOperatorReward == 0) {
-                // don't allow to set operator reward payee in case no operatorReward was set
-                return state.DoS(10, false, REJECT_INVALID, "bad-protx-operator-payee");
-            }
-            if (!ptx.scriptOperatorPayout.IsPayToPublicKeyHash() && !ptx.scriptOperatorPayout.IsPayToScriptHash()) {
-                return state.DoS(10, false, REJECT_INVALID, "bad-protx-operator-payee");
-            }
         }
 
         // we can only check the signature if pindexPrev != NULL and the MN is known
