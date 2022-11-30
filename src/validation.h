@@ -181,6 +181,8 @@ extern bool fReindex;
 extern int nScriptCheckThreads;
 extern bool fTxIndex;
 extern bool fIsBareMultisigStd;
+extern bool fRequireStandard;
+extern bool fCheckBlockIndex;
 
 // Settings
 extern int64_t nTransactionFee;
