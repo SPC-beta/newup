@@ -284,12 +284,6 @@ UniValue protx_masternode(const JSONRPCRequest& request)
     tx.vout.emplace_back(collateralTxOut);
     CKey keyOwner = ParsePrivKey(pwallet, request.params[paramIdx + 1].get_str(), true);
 
-    if (request.params[paramIdx + 2].get_str() != "") {
-        if (!Lookup(request.params[paramIdx + 2].get_str().c_str(), ptx.addr, Params().GetDefaultPort(), false)) {
-            throw std::runtime_error(strprintf("invalid network address %s", request.params[paramIdx].get_str()));
-        }
-    }
-
     CBLSPublicKey pubKeyOperator = ParseBLSPubKey(request.params[paramIdx + 3].get_str(), "operator BLS address");
     CKeyID keyIDVoting = keyOwner.GetPubKey().GetID();
     ptx.nOperatorReward = 0;

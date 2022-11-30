@@ -156,11 +156,6 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
     if (pindexPrev) {
         auto mnList = deterministicMNManager->GetListForBlock(pindexPrev);
 
-        // only allow reusing of addresses when it's for the same collateral (which replaces the old MN)
-        if (mnList.HasUniqueProperty(ptx.addr) && mnList.GetUniquePropertyMN(ptx.addr)->collateralOutpoint != collateralOutpoint) {
-            //return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-addr");
-        }
-
         // never allow duplicate keys, even if this ProTx would replace an existing MN
         if (mnList.HasUniqueProperty(ptx.keyIDOwner) || mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-key");
