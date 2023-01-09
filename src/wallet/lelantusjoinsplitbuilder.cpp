@@ -314,8 +314,7 @@ CWalletTx LelantusJoinSplitBuilder::Build(
         // check fee
         result.SetTx(MakeTransactionRef(tx));
 
-        unsigned int szLimit = MAX_STANDARD_TX_SIZE;
-        if (GetTransactionWeight(tx) >= szLimit) {
+        if (GetTransactionWeight(tx) >= MAX_STANDARD_TX_SIZE) {
             throw std::runtime_error(_("Transaction too large-0"));
         }
 
